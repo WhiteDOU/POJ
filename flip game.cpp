@@ -1,79 +1,87 @@
-
-#include<stdio.h>
 #include<iostream>
-
+#include<sstream>
+#include<fstream>
+#include<vector>
+#include<list>
+#include<deque>
+#include<queue>
+#include<stack>
+#include<map>
+#include<set>
+#include<bitset>
+#include<algorithm>
+#include<cstdio>
+#include<cstdlib>
+#include<cstring>
+#include<cctype>
+#include<cmath>
+#include<ctime>
+#include<iomanip>
+#define INF 2147483647
+#define cls(x) memset(x,0,sizeof(x))
+#define rise(i,a,b) for(int i = a ; i <= b ; i++)
 using namespace std;
-int chess[4][4];
-int c = 33;
+const double eps(1e-8);
+typedef long long lint;
 
+int Map[6][6] = {  };
+int flag = 0, step;
+int change_row[] = {0,-1,0,1,0};
+int change_col[] = {0,0,1,0,-1};
 
-void build()//将棋盘的颜色以标记化
-{
-	char c;
-	int i, j;
-	for (i = 0; i < 4; i++)
-		for (j = 0; j < 4; j++)
-		{
+bool all_color(){
+	for(int i = 1 ; i <= 4 ; i++)
+		for(int j = 1 ; j <= 4 ; j++)
+			if(Map[i][j] != Map[1][1]) return false;
+	return true;
+}
+
+void flip(int row , int col){
+	for(int i = 0 ; i < 5 ; i++)
+		Map[row+change_row[i]][col+change_col[i]] = !Map[row+change_row[i]][col+change_col[i]];
+}
+
+void dfs(int row , int col , int deep){
+	if(deep == step){
+		flag = all_color();
+		return ;
+	}
+	if(flag) return;
+	if(row > 4 || col > 4) return;
+	flip(row,col);
+	if(row < 4)
+		dfs(row+1 , col , deep+1);
+	else
+		dfs(1, col+1 , deep+1);
+	flip(row,col);
+	if(row < 4)
+		dfs(row+1 , col , deep);
+	else
+		dfs(1 , col+1 , deep);
+	return;
+}
+void input(){
+	for(int i = 1 ; i <= 4 ; i++)
+		for(int j = 1 ; j <= 4 ; j++){
+			char c;
 			cin >> c;
-			if (c == 'w')
-				chess[i][j] = 0;
-			else
-				chess[i][j] = 1;
+			Map[i][j] = (c == 'b')? 1:0;
 		}
 }
-
-void turn(int x, int y)//翻转
-{
-	if (x >= 0 && x <= 3 && y >= 0 && y <= 3)
-		chess[x][y] = !chess[x][y];
-}
-
-void flip(int s)//一个棋子变化，周围四个都要变化
-{
-	int i = s / 4;//行
-	int j = s % 4;//列
-	turn(i, j);
-	turn(i + 1, j);
-	turn(i, j + 1);
-	turn(i - 1, j);
-	turn(i, j - 1);
-}
-
-int complete()//判断棋盘是否变成同一的颜色
-{
-	int i, j, s1 = 0;
-	for (i = 0; i < 4; i++)
-		for (j = 0; j < 4; j++)
-			s1 += chess[i][j];
-	if (s1 % 16)
-		return 0;
-	else
-		return 1;
-}
-
-void dfs(int s,int b) //s代表当前的方格，b代表反转的方格数
-{
-	if (complete())
-	{
-		if (c > b)
-			c=b;
-		return;
+void solve(){
+	for(step = 0 ; step <= 16 ; step++){
+		dfs(1,1,0);
+		if(flag) break;
 	}
-	if (s >= 16)
-		return;
-	dfs(s+1,b);
-	flip(s);
-	dfs(s+1,b+1);
-	flip(s);
-	
-}
-int main()
-{
-	build();
-	dfs(0,0);
-	if (c == 33)
-		cout<<"Impossible\n";
+	if(flag)
+		cout << step << endl;
 	else
-		cout<<c<<endl;
+		cout << "Impossible" << endl;
+}
+int main(){
+//	freopen("input.txt","r",stdin);
+//	freopen("output.txt","w+",stdout);
+	input();
+	solve();
 	return 0;
 }
