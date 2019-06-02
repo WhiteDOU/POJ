@@ -1,0 +1,82 @@
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <algorithm>
+#include <string>
+using namespace std;
+#include <set>
+#include <map>
+string S[10005];
+map<string ,int > G;
+bool OK[10005];
+int num;
+void check(string s){
+	string b;
+	int len=s.length();
+	for(int i=0;i<len;i++){
+		b=s;
+		for(int j=0;j<26;j++){
+			b[i]='a'+j;
+			if(G.count(b)){
+				OK[G[b]]=1;
+			}
+			b[i]=s[i];
+		}
+	}
+	for(int i=0;i<len;i++){
+		b.resize(len-1,0);
+		for(int j=0;j<i;j++){
+			b[j]=s[j];
+		}
+		for(int j=i+1;j<len;j++){
+			b[j-1]=s[j];
+		}
+		if(G.count(b)){
+			OK[G[b]]=1;
+		}
+	}
+	for(int i=0;i<len+1;i++){
+		b.resize(len+1,0);
+		for(int j=0;j<i;j++){
+			b[j]=s[j];
+		}
+		for(int j=i;j<len;j++){
+			b[j+1]=s[j];
+		}
+		for(int j=0;j<26;j++){
+			b[i]='a'+j;
+			if(G.count(b)){
+				OK[G[b]]=1;
+			}
+		}
+	}
+}
+
+
+
+int main(){
+	ios::sync_with_stdio(false);
+	num=0;
+	string s;
+	while(cin>>s){
+		if(s[0]=='#') break;
+		S[num]=s;
+		G.insert(make_pair(s,num));
+		num++;
+	}
+	while(cin>>s){
+		memset(OK,0,sizeof(OK));
+		if(s[0]=='#') break;
+		if(G.count(s)){
+			cout<<s<<" is correct"<<endl;
+		}
+		else{
+			cout<<s<<":";
+			check(s);
+			for(int i=0;i<num;i++){
+				if(OK[i]) cout<<" "<<S[i];
+			}
+			cout<<endl;
+		}
+	}
+}
